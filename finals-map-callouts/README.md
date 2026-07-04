@@ -7,7 +7,7 @@ A gamified study tool for learning map callouts in **THE FINALS**. Load annotate
 ## Features
 
 - **Three quiz modes**
-  - **Locate** — Shown a location name; click the correct region on the map. Wrong click marks the target red and re-queues it. Press **Pass** to skip and try again later.
+  - **Locate** — Shown a location name; click the correct region on the map. Wrong click marks the correct target red. Press **Pass** to skip and try again later. You can replay from only your wrong answers at the end.
   - **Multiple Choice** — An overlay is highlighted; pick the correct name from four unique options. Wrong answers offer "Try Again" (no answer revealed) or "Reveal".
   - **Type-in** — An overlay is highlighted; type the exact name. Comparison is case-insensitive and ignores punctuation.
 
