@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Finals Map Callouts</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HOME VIEW -->
+<div id="view-home" class="view active">
+  <div class="home-header">
+    <h1>The Finals Map Callouts</h1>
+    <p>Select a map to study</p>
+  </div>
+  <div class="home-controls">
+    <div class="mode-toggle" id="mode-toggle">
+      <button class="mode-btn active" data-mode="locate">Locate</button>
+      <button class="mode-btn" data-mode="multiple">Multiple Choice</button>
+      <button class="mode-btn" data-mode="type">Type-in</button>
+    </div>
+    <button id="load-file-btn" class="btn btn-secondary hosted-edit">+ Load Map File</button>
+    <button id="annotate-new-btn" class="btn btn-secondary hosted-edit">+ Annotate New Image</button>
+    <input type="file" id="file-input" accept=".json,.js" hidden class="hosted-edit">
+    <input type="file" id="image-input" accept="image/*" hidden class="hosted-edit">
+  </div>
+  <div id="map-grid" class="map-grid"></div>
+  <div id="no-maps-msg" class="empty-state hidden">
+    <p>No maps configured.</p>
+  </div>
+  <div style="text-align:center;padding:24px 16px 32px;font-size:12px;color:#475569;border-top:1px solid #1e293b;margin-top:auto;max-width:960px;width:100%;margin-left:auto;margin-right:auto">
+    Built by <strong style="color:#64748b">Typothetical</strong> &middot; Discord: <strong style="color:#64748b">@typothetical</strong><br>
+    Thanks to <strong style="color:#64748b">Appoh</strong> and <strong style="color:#64748b">Ape Squad</strong> for the map callouts
+  </div>
+</div>
+
+<!-- QUIZ VIEW -->
+<div id="view-quiz" class="view">
+  <div class="quiz-topbar">
+    <button id="back-to-home" class="btn btn-back">&larr; Maps</button>
+    <span id="quiz-title" class="quiz-title"></span>
+    <span id="quiz-score" class="quiz-score">0 / 0</span>
+    <span id="quiz-mode-badge" class="mode-badge">MC</span>
+  </div>
+  <div class="quiz-container" id="quiz-container">
+    <div id="locate-bar" class="locate-bar hidden">
+      <span>Where is </span><strong id="locate-name"></strong><span>?</span>
+      <button id="locate-pass" class="btn btn-secondary" style="margin-left:12px;font-size:12px">Pass</button>
+    </div>
+    <div class="quiz-map-wrapper" id="quiz-map-wrapper">
+      <img id="map-image" class="map-image" alt="Map" style="display:none">
+      <div id="map-overlay"></div>
+      <div id="click-indicator" class="click-indicator hidden"></div>
+    </div>
+    <div id="quiz-loading" class="quiz-loading">Loading map...</div>
+    <div id="quiz-error" class="quiz-error hidden">
+      <p>Could not load map data.</p>
+      <button id="load-map-file-btn" class="btn hosted-edit" style="margin-top:12px">Select Data File</button>
+      <input type="file" id="map-file-input" accept=".json,.js" hidden class="hosted-edit">
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION MODAL -->
+<div id="question-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-location-count" id="modal-count">0 / 0</span>
+      <span id="modal-hint" class="modal-hint"></span>
+    </div>
+    <div class="modal-body">
+      <p class="modal-question" id="modal-question">What is this place?</p>
+      <div id="choices-container" class="choices"></div>
+      <div id="type-container" class="type-container hidden">
+        <input type="text" id="type-input" placeholder="Type your answer..." autocomplete="off" spellcheck="false">
+        <button id="type-submit" class="btn btn-primary">Submit</button>
+      </div>
+      <div id="feedback-container" class="feedback-container hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <div id="wrong-actions" class="hidden" style="display:flex;gap:8px">
+        <button id="wrong-try-again" class="btn">Try Again</button>
+        <button id="wrong-reveal" class="btn" style="background:#334155;border-color:#475569">Reveal</button>
+      </div>
+      <button id="modal-continue" class="btn btn-primary">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS VIEW -->
+<div id="view-results" class="view">
+  <div class="results-container">
+    <h2>Results</h2>
+    <div class="results-score" id="results-score">0 / 0</div>
+    <div class="results-pct" id="results-pct">0%</div>
+    <div class="results-list" id="results-list"></div>
+    <div class="results-actions">
+      <button id="results-retry-wrong" class="btn">Retry Wrong Answers</button>
+      <button id="results-retry-all" class="btn btn-primary">Retry All</button>
+      <button id="results-back" class="btn btn-secondary">Back to Maps</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANNOTATION VIEW -->
+<div id="view-annotate" class="view">
+  <div class="quiz-topbar">
+    <button id="annotate-back" class="btn btn-back">&larr; Maps</button>
+    <span id="annotate-title" class="quiz-title"></span>
+    <span id="annotate-count" class="annotate-count">0 locations</span>
+    <span id="annotate-hint" class="annotate-hint">Drag across each label</span>
+    <button id="annotate-save" class="btn">Save</button>
+    <button id="annotate-clear" class="btn" style="color:#ef4444">Clear</button>
+    <button id="annotate-quiz" class="btn btn-primary">Quiz</button>
+  </div>
+  <div class="quiz-container" id="annotate-container">
+    <div class="quiz-map-wrapper" id="annotate-map-wrapper">
+      <img id="annotate-image" class="map-image" alt="Map" style="display:none">
+      <div id="annotate-overlay"></div>
+    </div>
+    <div id="annotate-loading" class="quiz-loading">Loading map...</div>
+    <div id="annotate-prompt" class="annotate-prompt hidden">
+      <p>No saved annotations found.</p>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button id="annotate-load-json-btn" class="btn btn-primary">Select Data File</button>
+        <button id="annotate-start-fresh" class="btn">Start Fresh</button>
+      </div>
+    </div>
+    <input type="file" id="annotate-json-input" accept=".json,.js" hidden>
+  </div>
+
+  <div id="annotate-name-modal" class="modal-overlay hidden">
+    <div class="modal" style="max-width:360px">
+      <div class="modal-header"><span>Name this location</span></div>
+      <div class="modal-body">
+        <input type="text" id="annotate-name-input" placeholder="Type location name..." style="width:100%;padding:10px 14px;border:1px solid #334155;border-radius:8px;background:#141428;color:#e2e8f0;font-size:14px;outline:none;box-sizing:border-box">
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+          <button id="annotate-name-cancel" class="btn">Cancel</button>
+          <button id="annotate-name-ok" class="btn btn-primary">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="annotate-toolbar" class="annotate-toolbar hidden">
+    <span id="annotate-selected-name" class="annotate-selected-name"></span>
+    <button id="annotate-edit-name" class="btn">Edit</button>
+    <button id="annotate-delete" class="btn" style="color:#ef4444">Delete</button>
+    <button id="annotate-deselect" class="btn btn-secondary">Deselect</button>
+  </div>
+</div>
+
+<!-- CALLOUTS VIEW -->
+<div id="view-callouts" class="view">
+  <div class="quiz-topbar">
+    <button id="callouts-back" class="btn btn-back">&larr; Maps</button>
+    <span id="callouts-title" class="quiz-title"></span>
+  </div>
+  <div class="quiz-container" id="callouts-container">
+    <div class="quiz-map-wrapper" id="callouts-map-wrapper">
+      <img id="callouts-image" class="map-image" alt="Map" style="display:none">
+      <div id="callouts-overlay"></div>
+    </div>
+    <div id="callouts-loading" class="quiz-loading">Loading map...</div>
+    <div id="callouts-error" class="quiz-error hidden">
+      <p>No callout data found for this map.</p>
+    </div>
+  </div>
+</div>
+
+<script src="utils.js"></script>
+<script src="storage.js"></script>
+<script src="app.js"></script>
+<script src="quiz.js"></script>
+<script src="annotate.js"></script>
+</body>
+</html>
