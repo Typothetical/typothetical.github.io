@@ -8,7 +8,6 @@ function startQuiz(index) {
   state.mapConfig = cfg;
   state.answered = new Map();
   state.wrongIndices = [];
-  state.wrongMarked = new Set();
   state.choicesPool = null;
   state.finished = false;
   state.currentIndex = -1;
@@ -45,7 +44,6 @@ function startQuizFromData(data, title) {
   state.locations = data.locations || [];
   state.answered = new Map();
   state.wrongIndices = [];
-  state.wrongMarked = new Set();
   state.choicesPool = null;
   state.finished = false;
   state.currentIndex = -1;
@@ -135,13 +133,6 @@ function applyAnsweredState() {
     div.classList.add('answered');
     if (!result.correct && !result.revealed) div.classList.add('wrong');
   }
-  for (const idx of state.wrongMarked) {
-    if (state.answered.has(idx)) continue;
-    const div = overlay.querySelector(`[data-index="${idx}"]`);
-    if (div) {
-      div.classList.add('answered', 'wrong');
-    }
-  }
   updateScore();
   checkFinished();
 }
@@ -198,14 +189,12 @@ document.getElementById('quiz-map-wrapper').addEventListener('click', e => {
 
   if (isCorrect) {
     state.answered.set(clickedIdx, { correct: true, answer: loc.text });
-    state.wrongMarked.delete(clickedIdx);
     if (clickedIdx !== idx) {
       state.locateOrder.push(idx);
     }
     indicator.className = 'click-indicator correct';
   } else {
-    state.wrongMarked.add(idx);
-    state.locateOrder.push(idx);
+    state.answered.set(idx, { correct: false, answer: loc.text });
     indicator.className = 'click-indicator wrong';
   }
 
