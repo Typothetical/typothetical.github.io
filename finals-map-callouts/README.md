@@ -90,8 +90,6 @@ Add new maps in the `MAPS` array in `storage.js`:
 
 ## Maps included
 
-All 8 maps currently in rotation for THE FINALS:
-
 | Map               | Callouts |
 |-------------------|----------|
 | Bernal Callouts   | 50       |
